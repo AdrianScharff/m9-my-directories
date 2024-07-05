@@ -3,7 +3,7 @@ const mongoose = require('mongoose')
 const movieSchema = new mongoose.Schema({
   adult: { type: Boolean },
   backdrop_path: String,
-  // genre_ids: Array(4),
+  genre_ids: [Number],
   original_language: String,
   original_title: String,
   overview: String,
