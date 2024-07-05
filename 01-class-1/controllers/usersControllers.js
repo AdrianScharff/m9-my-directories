@@ -43,13 +43,35 @@ const register = asyncHandler(async (req, res) => {
   }
 })
 
-const login = (req, res) => {
-  res.status(200).json({ message: 'Login Usuario' })
+const login = asyncHandler(async (req, res) => {
+
+  const { email, password } = req.body
+
+  // verificar q el usuario exista
+  const user = await User.findOne({ email })
+
+  if (user && (await bcrypt.compare(password, user.password))) {
+    res.status(200).json({
+      _id: user.id,
+      nombre: user.nombre,
+      email: user.email,
+      token: generarToken(user.id)
+    })
+  } else {
+    res.status(400)
+    throw new Error('Credenciales incorrectas')
+  }
+})
+
+// generar el token
+const generarToken = (id) => {
+  return jwt.sign({ id }, process.env.JWT_SECRET, {
+    expiresIn: '30d'
+  })
 }
 
-
 const data = (req, res) => {
-  res.status(200).json({ message: 'Mis Datos' })
+  res.status(200).json(req.user)
 }
 
 module.exports = {

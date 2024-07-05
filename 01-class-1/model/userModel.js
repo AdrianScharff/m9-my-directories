@@ -12,7 +12,7 @@ const userSchema = mongoose.Schema({
   },
   password: {
     type: String,
-    required: [true, "Por favor teclea la password"]
+    required: [true, "Por favor teclea tu password"]
   },
   esAdmin: {
     type: Boolean,
