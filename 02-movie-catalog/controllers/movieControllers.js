@@ -1,20 +1,84 @@
-const createOneMovie = (req, res) => {
-  res.status(201).json({ message: "Here I can create a movie" })
-}
+const Movie = require('../models/movieModel')
+const asyncHandler = require('express-async-handler')
+const mongoose = require('mongoose')
 
-const getAllMovies = (req, res) => {
-  res.status(200).json({ message: "Here are all the movies" })
-}
+const createOneMovie = asyncHandler(async (req, res) => {
+  if (!req.body.title) {
+    res.status(400)
+    throw new Error('Please provide the title of the movie')
+  }
+  if (!req.body.vote_average) {
+    res.status(400)
+    throw new Error('Please provide the vote average of the movie')
+  }
 
-const updateOneMovie = (req, res) => {
+  const movie = await Movie.create({
+    title: req.body.title,
+    vote_average: req.body.vote_average
+  })
+
+  res.status(201).json(movie)
+})
+
+const getAllMovies = asyncHandler(async (req, res) => {
+  const movies = await Movie.find({
+    $or: [
+      { active: true },
+      { active: { $exists: false } }
+    ]
+  })
+  res.status(200).json(movies)
+})
+
+const updateOneMovie = asyncHandler(async (req, res) => {
   const id = req.params.id
-  res.status(200).json({ message: `Here I can update the movie with id: ${id}` })
-}
 
-const deleteOneMovie = (req, res) => {
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    res.status(400);
+    throw new Error('Invalid movie id');
+  }
+
+  const movie = await Movie.findById(id)
+  if (!movie) {
+    res.status(404)
+    throw new Error('Movie not found')
+  }
+
+  if (Object.keys(req.body).length === 0) {
+    res.status(400)
+    throw new Error('Please provide the data to update')
+  }
+
+  const updatedMovie = await Movie.findByIdAndUpdate(id, req.body, { new: true })
+  res.status(200).json(updatedMovie)
+})
+
+const deleteOneMovie = asyncHandler(async (req, res) => {
   const id = req.params.id
-  res.status(200).json({ message: `Here I can delete the movie with id: ${id}` })
-}
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    res.status(400);
+    throw new Error('Invalid movie id');
+  }
+
+  const movie = await Movie.findById(id)
+  if (!movie) {
+    res.status(404)
+    throw new Error('Movie not found')
+  }
+
+  if (req.query.destroy !== 'true') {
+    if (movie.active === false) {
+      res.status(404)
+      throw new Error("Couldn't delete, movie not found")
+    }
+    const softDeletedMovie = await Movie.findByIdAndUpdate(id, { active: false })
+    return res.status(200).json({ id: id })
+  }
+
+  const deletedMovie = await movie.deleteOne()
+  return res.status(200).json({ _id: id })
+})
 
 module.exports = {
   createOneMovie,

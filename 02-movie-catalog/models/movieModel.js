@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 
 const movieSchema = new mongoose.Schema({
-  adult: { type: Boolean },
+  adult: { type: Boolean, default: false },
   backdrop_path: String,
   genre_ids: [Number],
   original_language: String,
@@ -10,11 +10,12 @@ const movieSchema = new mongoose.Schema({
   popularity: Number,
   poster_path: String,
   release_date: String,
-  title: String,
+  title: { type: String, required: true },
   video: Boolean,
-  vote_average: Number,
-  vote_count: Number
-})
+  vote_average: { type: Number, required: true },
+  vote_count: Number,
+  active: { type: Boolean, default: true }
+}, { timestamp: true })
 
 const Movie = mongoose.model('Movie', movieSchema)
 
