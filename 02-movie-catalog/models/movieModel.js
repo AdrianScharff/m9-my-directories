@@ -14,6 +14,7 @@ const movieSchema = new mongoose.Schema({
   video: Boolean,
   vote_average: { type: Number, required: true },
   vote_count: Number,
+  likes: { type: Number, default: 0 },
   active: { type: Boolean, default: true }
 }, { timestamp: true })
 

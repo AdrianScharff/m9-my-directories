@@ -12,10 +12,7 @@ const createOneMovie = asyncHandler(async (req, res) => {
     throw new Error('Please provide the vote average of the movie')
   }
 
-  const movie = await Movie.create({
-    title: req.body.title,
-    vote_average: req.body.vote_average
-  })
+  const movie = await Movie.create(req.body)
 
   res.status(201).json(movie)
 })
@@ -53,6 +50,30 @@ const updateOneMovie = asyncHandler(async (req, res) => {
   res.status(200).json(updatedMovie)
 })
 
+const updateLikes = asyncHandler(async (req, res) => {
+  const id = req.params.id
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    res.status(400);
+    throw new Error('Invalid movie id');
+  }
+
+  const movie = await Movie.findById(id)
+  if (!movie) {
+    res.status(404)
+    throw new Error('Movie not found')
+  }
+
+  const newLikes = req.query.likes
+  if (!newLikes || isNaN(newLikes)) {
+    res.status(400)
+    throw new Error('Please provide the new number of likes')
+  }
+
+  const updatedMovie = await Movie.findByIdAndUpdate(id, { likes: newLikes }, { new: true })
+  res.status(200).json(updatedMovie)
+})
+
 const deleteOneMovie = asyncHandler(async (req, res) => {
   const id = req.params.id
 
@@ -84,5 +105,6 @@ module.exports = {
   createOneMovie,
   getAllMovies,
   updateOneMovie,
-  deleteOneMovie
+  deleteOneMovie,
+  updateLikes
 }
