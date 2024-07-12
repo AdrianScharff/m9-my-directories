@@ -2,7 +2,7 @@ const express = require('express')
 const colors = require('colors')
 const dotenv = require('dotenv').config()
 const movieRoutes = require('./routes/movieRoutes')
-const userRoutes = require('./routes/authRoutes')
+const userRoutes = require('./routes/userRoutes')
 const connectDB = require('./config/db')
 const { errorHandler } = require('./middlewares/errorHandler')
 

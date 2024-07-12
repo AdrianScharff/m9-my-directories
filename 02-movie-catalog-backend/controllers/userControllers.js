@@ -73,10 +73,21 @@ const generateToken = (id) => {
 }
 
 const data = (req, res) => {
-    res.status(200).json(req.user)
+  res.status(200).json(req.user)
 }
+
+const getAllUsers = asyncHandler(async (req, res) => {
+  const users = await User.find().select('-password')
+  if (users.length === 0) {
+    res.status(404)
+    throw new Error('users not found')
+  }
+  res.status(200).json(users)
+})
 
 module.exports = {
   register,
-  login
+  login,
+  data,
+  getAllUsers
 }
