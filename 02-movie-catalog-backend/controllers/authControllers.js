@@ -50,7 +50,7 @@ const login = asyncHandler(async (req, res) => {
   // if (user) {
   //   res.status(400)
   //   throw new Error('Incorrect email or password')
-  }
+  // }
 
 
 
