@@ -72,6 +72,10 @@ const generateToken = (id) => {
   })
 }
 
+const data = (req, res) => {
+    res.status(200).json(req.user)
+}
+
 module.exports = {
   register,
   login
