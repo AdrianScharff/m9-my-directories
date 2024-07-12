@@ -57,10 +57,11 @@ const login = asyncHandler(async (req, res) => {
   const emailMatches = await bcrypt.compare(password, user.password)
   if (emailMatches) {
     res.status(200).json({
-      _id: user.id,
+      _id: user._id,
       name: user.name,
       email: user.email,
-      token: generateToken(user.id)
+      role: user.role,
+      token: generateToken(user._id)
     })
   } else {
     res.status(400)
