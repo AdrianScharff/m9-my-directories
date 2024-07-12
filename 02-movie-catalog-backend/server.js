@@ -2,6 +2,7 @@ const express = require('express')
 const colors = require('colors')
 const dotenv = require('dotenv').config()
 const movieRoutes = require('./routes/movieRoutes')
+const userRoutes = require('./routes/authRoutes')
 const connectDB = require('./config/db')
 const { errorHandler } = require('./middlewares/errorHandler')
 
@@ -15,6 +16,7 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 
 app.use('/api/v1', movieRoutes)
+app.use('/api/v1', userRoutes)
 
 app.use(errorHandler)
 
