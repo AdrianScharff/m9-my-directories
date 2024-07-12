@@ -1,7 +1,7 @@
 const User = require('../models/userModel')
 const asyncHandler = require('express-async-handler')
 const bcrypt = require('bcryptjs')
-const JWT = require('jsonwebtoken')
+const jwt = require('jsonwebtoken')
 
 const register = asyncHandler(async (req, res) => {
   const body = req.body
@@ -39,23 +39,38 @@ const register = asyncHandler(async (req, res) => {
 })
 
 const login = asyncHandler(async (req, res) => {
-  // const { email, password } = req.body
+  const { email, password } = req.body
 
-  // if (!email || !password) {
-  //   res.status(400)
-  //   throw new Error('Email or password is missing')
-  // }
+  if (!email || !password) {
+    res.status(400)
+    throw new Error('Email or password is missing')
+  }
 
-  // const user = User.findOne({ email: email })
-  // if (user) {
-  //   res.status(400)
-  //   throw new Error('Incorrect email or password')
-  // }
+  const user = await User.findOne({ email: email })
+  if (!user) {
+    res.status(400)
+    throw new Error('Incorrect email or password')
+  }
 
-
-
-
+  const emailMatches = await bcrypt.compare(password, user.password)
+  if (emailMatches) {
+    res.status(200).json({
+      _id: user.id,
+      name: user.name,
+      email: user.email,
+      token: generateToken(user.id)
+    })
+  } else {
+    res.status(400)
+    throw new Error('Incorrect email or password')
+  }
 })
+
+const generateToken = (id) => {
+  return jwt.sign({ id }, process.env.JWT_SECRET, {
+    expiresIn: '30d'
+  })
+}
 
 module.exports = {
   register,
