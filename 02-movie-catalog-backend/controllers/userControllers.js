@@ -7,7 +7,7 @@ const register = asyncHandler(async (req, res) => {
   const body = req.body
 
   if (!body.name || !body.email || !body.password) {
-    res.status(404)
+    res.status(400)
     throw new Error('Please provide name, email and password')
   }
 
