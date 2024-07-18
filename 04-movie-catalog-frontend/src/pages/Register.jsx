@@ -1,16 +1,38 @@
 import { useState, useEffect } from 'react'
 import { FaUser } from 'react-icons/fa'
 import { useSelector, useDispatch } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
+import { toast } from 'react-toastify'
+import { reset, register } from '../features/auth/authSlice'
+import Spinner from '../components/Spinner'
 
 const Register = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
+    role: '',
     password: '',
     password2: ''
   })
 
-  const { name, email, password, password2 } = formData
+  const { name, email, role, password, password2 } = formData
+
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
+
+  const { user, isLoading, isSuccess, isError, message } = useSelector((state) => state.auth)
+
+  useEffect(() => {
+    if (isError) {
+      toast.error(message)
+    }
+
+    if (isSuccess) {
+      navigate('/login')
+    }
+
+    dispatch(reset())
+  }, [user, isError, isSuccess, message, dispatch, navigate])
 
   const onChange = (e) => {
     setFormData((prev) => ({
@@ -21,8 +43,23 @@ const Register = () => {
 
   const onSubmit = (e) => {
     e.preventDefault()
-    console.log('Register form submitted')
-    console.log(`name: ${name}, email: ${email}, password: ${password}`)
+
+    if (password !== password2) {
+      toast.error("The passwords doesn't match")
+    } else {
+      const data = {
+        name,
+        email,
+        role: role === '' ? 'CUSTOMER' : role,
+        password
+      }
+
+      dispatch(register(data))
+    }
+  }
+
+  if (isLoading) {
+    return <Spinner />
   }
 
   return (
@@ -51,6 +88,20 @@ const Register = () => {
             placeholder='Email'
             onChange={onChange}
           />
+          <select
+            name='role'
+            id='role'
+            value={role}
+            className='border w-full p-2 text-slate-400'
+            placeholder='Role'
+            onChange={onChange}
+          >
+            <option value=''>
+              Select role
+            </option>
+            <option value='CUSTOMER'>CUSTOMER</option>
+            <option value='ADMIN'>ADMIN</option>
+          </select>
           <input
             type='password'
             name='password'
