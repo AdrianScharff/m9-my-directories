@@ -7,10 +7,6 @@ const createOneMovie = asyncHandler(async (req, res) => {
     res.status(400)
     throw new Error('Please provide the title of the movie')
   }
-  if (!req.body.vote_average) {
-    res.status(400)
-    throw new Error('Please provide the vote average of the movie')
-  }
 
   const movie = await Movie.create(req.body)
 
@@ -50,7 +46,7 @@ const updateOneMovie = asyncHandler(async (req, res) => {
   res.status(200).json(updatedMovie)
 })
 
-const updateLikes = asyncHandler(async (req, res) => {
+const addNewLike = asyncHandler(async (req, res) => {
   const id = req.params.id
 
   if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -64,13 +60,9 @@ const updateLikes = asyncHandler(async (req, res) => {
     throw new Error('Movie not found')
   }
 
-  const newLikes = req.query.likes
-  if (!newLikes || isNaN(newLikes)) {
-    res.status(400)
-    throw new Error('Please provide the new number of likes')
-  }
+  const currentLikes = movie.likes
 
-  const updatedMovie = await Movie.findByIdAndUpdate(id, { likes: newLikes }, { new: true })
+  const updatedMovie = await Movie.findByIdAndUpdate(id, { $inc: { likes: 1 } }, { new: true })
   res.status(200).json(updatedMovie)
 })
 
@@ -94,7 +86,7 @@ const deleteOneMovie = asyncHandler(async (req, res) => {
       throw new Error("Couldn't delete, movie not found")
     }
     const softDeletedMovie = await Movie.findByIdAndUpdate(id, { active: false })
-    return res.status(200).json({ id: id })
+    return res.status(200).json({ _id: id })
   }
 
   const deletedMovie = await movie.deleteOne()
@@ -106,5 +98,5 @@ module.exports = {
   getAllMovies,
   updateOneMovie,
   deleteOneMovie,
-  updateLikes
+  addNewLike
 }
