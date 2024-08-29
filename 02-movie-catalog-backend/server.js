@@ -3,6 +3,7 @@ const colors = require('colors')
 const dotenv = require('dotenv').config()
 const movieRoutes = require('./routes/movieRoutes')
 const userRoutes = require('./routes/userRoutes')
+const testRoute = require('./routes/TestRoute')
 const connectDB = require('./config/db')
 const { errorHandler } = require('./middlewares/errorHandler')
 const cors = require('cors')
@@ -20,6 +21,7 @@ app.use(express.urlencoded({ extended: false }))
 
 app.use('/api/v1', movieRoutes)
 app.use('/api/v1', userRoutes)
+app.use('', testRoute)
 
 app.use(errorHandler)
 
